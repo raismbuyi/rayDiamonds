@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Chat</title>
+    <style>
+        /* Styles CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .form-section {
+            width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .form-section h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 15px 20px; /* Agrandir la taille du bouton */
+            background-color: #87CEEB; /* Couleur bleu ciel */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* Agrandir la taille de la police */
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease; /* Ajouter une transition */
+        }
+        button:hover {
+            background-color: #5eadee; /* Couleur bleu ciel plus foncée au survol */
+        }
+        .chat-section {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 20px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .message.sent {
+            justify-content: flex-end;
+        }
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .entertainment-section {
+            width: 400px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            display: none;
+            margin-bottom: 20px;
+        }
+        .status {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .status-actions {
+            display: flex;
+            align-items: center;
+        }
+        .status-actions button {
+            margin-left: 10px;
+        }
+        .comments-section {
+            margin-top: 10px;
+        }
+        .comment {
+            margin-bottom: 5px;
+        }
+        .photos-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .media {
+            width: calc(50% - 10px); /* Agrandir la taille des médias */
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .media img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        .media video {
+            width: 100%;
+            height: auto;
+        }
+        .like-button, .comment-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .comment-input {
+            width: calc(100% - 90px);
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+            margin-right: 5px;
+        }
+        .view-section {
+            width: 400px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            display: none;
+            margin-bottom: 20px;
+        }
+        .view-section h3 {
+            margin-bottom: 10px;
+        }
+        .likes, .comments {
+            margin-bottom: 10px;
+        }
+        .search-bar {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="identification-page" class="form-section">
+            <h2>Identification</h2>
+            <input type="text" id="new-username" placeholder="Nouveau nom d'utilisateur">
+            <input type="password" id="new-password" placeholder="Nouveau mot de passe">
+            <input type="file" id="profile-picture" accept="image/*" style="display: none;">
+            <label for="profile-picture">Choisir une photo de profil</label>
+            <button onclick="register()">S'inscrire</button>
+            <hr>
+            <input type="text" id="username" placeholder="Nom d'utilisateur">
+            <input type="password" id="password" placeholder="Mot de passe">
+            <button onclick="login()">Se connecter</button>
+        </div>
+        <div id="chat-page" style="display:none;">
+            <h2>Chat</h2>
+            <div class="chat-section" id="chat-section">
+                <!-- Messages seront affichés ici -->
+            </div>
+            <div class="input-section">
+                <input type="text" id="message" placeholder="Entrez votre message">
+                <button onclick="sendMessage()">Envoyer</button>
+            </div>
+            <button onclick="toggleEntertainment()">Divertissement</button>
+            <div class="entertainment-section" id="entertainment-section">
+                <h3>Divertissement</h3>
+                <input type="file" id="upload-media" accept="image/*, video/*" onchange="previewMedia(event)">
+                <div class="photos-section" id="photos-section">
+                    <!-- Médias seront affichés ici -->
+                </div>
+            </div>
+            <div class="view-section" id="view-section">
+                <h3>Vos activités</h3>
+                <div class="likes" id="likes-section">
+                    <!-- Likes seront affichés ici -->
+                </div>
+                <div class="comments" id="comments-section">
+                    <!-- Commentaires seront affichés ici -->
+                </div>
+            </div>
+            <input type="text" id="search-bar" class="search-bar" placeholder="Rechercher un ami...">
+            <button onclick="searchFriend()">Rechercher</button>
+            <div id="friend-list">
+                <!-- La liste des amis sera affichée ici -->
+            </div>
+        </div>
+    </div>
+    <script>
+        // Données simulées pour la démo
+        const users = [
+            { username: "user1", password: "password1", profilePicture: null },
+            { username: "user2", password: "password2", profilePicture: null }
+        ];
+
+        let currentUser = null;
+
+        function register() {
+            const newUsername = document.getElementById("new-username").value;
+            const newPassword = document.getElementById("new-password").value;
+            const profilePicture = document.getElementById("profile-picture").files[0];
+            // Vérifie si les champs sont vides
+            if (!newUsername.trim() || !newPassword.trim() || !profilePicture) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+            // Vérifie si le nom d'utilisateur est déjà utilisé
+            const existingUser = users.find(user => user.username === newUsername);
+            if (existingUser) {
+                alert("Ce nom d'utilisateur est déjà utilisé. Veuillez en choisir un autre");
+                return;
+            }
+            // Enregistre le nouvel utilisateur avec sa photo de profil
+            users.push({ username: newUsername, password: newPassword, profilePicture });
+            alert("Inscription réussie !");
+            // Réinitialise les champs du formulaire
+            document.getElementById("new-username").value = "";
+            document.getElementById("new-password").value = "";
+            document.getElementById("profile-picture").value = "";
+        }
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            // Vérifie les informations d'identification
+            const user = users.find(user => user.username === username && user.password === password);
+            if (user) {
+                // Connecte l'utilisateur
+                currentUser = user;
+                document.getElementById("identification-page").style.display = "none";
+                document.getElementById("chat-page").style.display = "block";
+            } else {
+                alert("Nom d'utilisateur ou mot de passe incorrect.");
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("message");
+            const message = messageInput.value.trim();
+            if (message) {
+                const chatSection = document.getElementById("chat-section");
+                const newMessage = document.createElement("div");
+                newMessage.classList.add("message", "sent");
+                
+                // Créer une balise img pour afficher la photo de profil de l'utilisateur
+                const userProfileImg = document.createElement("img");
+                userProfileImg.src = currentUser.profilePicture ? URL.createObjectURL(currentUser.profilePicture) : "placeholder.jpg";
+                userProfileImg.alt = "Photo de profil";
+                userProfileImg.classList.add("user-profile");
+                newMessage.appendChild(userProfileImg);
+                
+                // Ajouter le message texte
+                const messageText = document.createElement("span");
+                messageText.textContent = currentUser.username + ": " + message;
+                newMessage.appendChild(messageText);
+
+                chatSection.appendChild(newMessage);
+                messageInput.value = "";
+                // Fait défiler jusqu'au bas du chat
+                chatSection.scrollTop = chatSection.scrollHeight;
+            }
+        }
+
+        function toggleEntertainment() {
+            const entertainmentSection = document.getElementById("entertainment-section");
+            if (entertainmentSection.style.display === "none") {
+                entertainmentSection.style.display = "block";
+            } else {
+                entertainmentSection.style.display = "none";
+            }
+        }
+
+        function previewMedia(event) {
+            const photosSection = document.getElementById("photos-section");
+            const mediaContainer = document.createElement("div");
+            mediaContainer.classList.add("media");
+            const media = document.createElement(event.target.files[0].type.startsWith('image/') ? 'img' : 'video');
+            media.src = URL.createObjectURL(event.target.files[0]);
+            media.classList.add(event.target.files[0].type.startsWith('image/') ? 'photo' : 'video');
+            media.onload = function() {
+                URL.revokeObjectURL(this.src);
+            }
+            mediaContainer.appendChild(media);
+
+            const likeButton = document.createElement("button");
+            likeButton.textContent = "J'aime";
+            likeButton.classList.add("like-button");
+            likeButton.onclick= function() {
+                likeMedia(media.src);
+            };
+            mediaContainer.appendChild(likeButton);
+
+            const commentInput = document.createElement("input");
+            commentInput.type = "text";
+            commentInput.placeholder = "Ajouter un commentaire";
+            commentInput.classList.add("comment-input");
+            mediaContainer.appendChild(commentInput);
+
+            const commentButton = document.createElement("button");
+            commentButton.textContent = "Commenter";
+            commentButton.classList.add("comment-button");
+            commentButton.onclick = function() {
+                commentOnMedia(media.src, commentInput.value);
+                commentInput.value = "";
+            };
+            mediaContainer.appendChild(commentButton);
+
+            photosSection.appendChild(mediaContainer);
+        }
+
+        function likeMedia(mediaSrc) {
+            alert("Média aimé : " + mediaSrc);
+        }
+
+        function commentOnMedia(mediaSrc, comment) {
+            alert("Commentaire sur le média " + mediaSrc + " : " + comment);
+        }
+
+        function searchFriend() {
+            const searchBar = document.getElementById("search-bar");
+            const searchQuery = searchBar.value.trim().toLowerCase();
+            if (searchQuery) {
+                // Simuler une recherche d'amis (données factices)
+                const friendList = document.getElementById("friend-list");
+                friendList.innerHTML = ""; // Effacer les résultats précédents
+                const matchingUsers = users.filter(user => user.username.toLowerCase().includes(searchQuery));
+                matchingUsers.forEach(user => {
+                    const friendItem = document.createElement("div");
+                    friendItem.textContent = user.username;
+                    friendList.appendChild(friendItem);
+                });
+            } else {
+                alert("Veuillez entrer un terme de recherche.");
+            }
+        }
+    </script>
+</body>
+</html>
